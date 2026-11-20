@@ -67,7 +67,7 @@ body.v .ew{display:none!important}body:not(.v) .vw{display:none!important}
 #vtk{position:relative;flex:1;height:28px;background:#3a3f49;border-radius:6px;cursor:pointer;touch-action:none}#vsel{position:absolute;top:0;bottom:0;background:#4c9dff55;border:1px solid var(--a);border-radius:4px;pointer-events:none}#vph{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1px;background:#fff;border-radius:2px;box-shadow:0 0 0 1px #000a;pointer-events:none}
 #vtime{min-width:112px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 #vnud{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding:0 8px 8px;background:var(--p)}#vnud button{min-width:56px}
-.vinfo{margin:6px 0;opacity:.85;word-break:break-all}#vinfo{white-space:pre-line}#vside small{display:block;margin:4px 0}#vside input[type=text]{width:100%;min-width:0}.logo2{display:block;width:100%;height:auto;border-radius:8px;margin-bottom:4px}#vEst,#vWarn{white-space:pre-line}#vWarn{color:#ff8a8a}
+.vinfo{margin:6px 0;opacity:.85;word-break:break-all}#vinfo,#sinfo{white-space:pre-line}#vside small{display:block;margin:4px 0}#vside input[type=text]{width:100%;min-width:0}.logo2{display:block;width:100%;height:auto;border-radius:8px;margin-bottom:4px}#vEst,#vWarn{white-space:pre-line}#vWarn{color:#ff8a8a}
 #vres{display:none;margin-top:12px;padding:10px;border:1px solid var(--a);border-radius:8px;background:#1f2228}#vres img,#vres video,#res img,#res video{display:block;width:100%;max-width:100%;height:auto;max-height:320px;object-fit:contain;border-radius:4px;background:repeating-conic-gradient(#2a2d33 0 25%,#23262b 0 50%) 0 0/16px 16px}
 @media (max-width:800px){body{display:flex;flex-direction:column;height:auto;min-height:100vh}main{order:1;position:sticky;top:0;z-index:20;background:var(--bg);flex:none}aside{order:2;overflow:visible;padding:10px;grid-area:auto}#asb{display:none}footer{order:3}#stage{flex:none;height:42vh;padding:6px}input,select,textarea{font-size:16px}button{padding:8px 12px}.lg button{padding:6px 12px}dialog{min-width:0;width:92vw}.r4{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:900px) and (orientation:landscape){main{position:static}#stage{height:70vh}}
@@ -128,6 +128,7 @@ textarea.flash{box-shadow:0 0 0 3px var(--a)}
 <input type="file" id="fSrc" accept="image/*,video/*" style="width:100%">
 <div class="bar"><input id="url" placeholder="GIF-URL" style="flex:1"><button id="bUrl">Laden</button></div>
 <small>Auch per Drag &amp; Drop ins Fenster.</small>
+<div id="sinfo" class="vinfo" data-nt></div>
 <h3>Bearbeiten</h3>
 <div class="r"><label>Start-Bild<input type="number" id="ta" min="1"></label><label>End-Bild<input type="number" id="tb" min="1"></label></div>
 <div class="r"><label>Tempo ×<input type="number" id="sp" step="0.1" min="0.1"></label><label><br><input type="checkbox" id="rv"> Rückwärts</label></div>
@@ -1121,6 +1122,11 @@ cv.addEventListener('dblclick',e=>{if(!S||drawMode)return;const[nx,ny]=pt(e),g=g
  const b=[...boxes].reverse().find(q=>{const a=-q.r*Math.PI/180,dx=x-q.cx,dy=y-q.cy,u=dx*Math.cos(a)-dy*Math.sin(a),v=dx*Math.sin(a)+dy*Math.cos(a);return Math.abs(u)<=q.w/2&&Math.abs(v)<=q.h/2});
  if(b)editText(b.l)});
 $('#ll').addEventListener('dblclick',e=>{if(e.target.closest('button'))return;const d=e.target.closest('.ly');if(d&&P)editText(P.layers[+d.dataset.i])});
+/* Quell-Info im Editor: Name, Auflösung, Bildrate, Länge (wie im Video-Tab) */
+function updSInfo(){const e=$('#sinfo');if(!e)return;if(!S){e.textContent='';return}
+ const n=S.frames.length,tot=S.frames.reduce((a,f)=>a+f.delay,0),fps=n>1&&tot>0?n*1000/tot:0;
+ e.textContent=`${S.src&&S.src.name?S.src.name+'\n':''}${T('Original:')} \u2066${S.W}×${S.H}\u2069${fps?` · \u2066${fpsT(fps)} FPS\u2069`:''} · \u2066${fmtT(tot/1000)}\u2069 · ${n} ${T('Bilder')}`}
+{const _uo=updOfps;updOfps=()=>{_uo();updSInfo()}}
 if(WM_LOCK)['#wmOn','#vWm','#wmText','#vWmT'].forEach(s=>{$(s).disabled=true});
 ubtn();
 panel();setLang(lang);
