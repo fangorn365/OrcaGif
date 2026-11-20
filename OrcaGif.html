@@ -513,7 +513,7 @@ async function loadSource0(bytes,mime,name){
  let wp=null;if(mime=='image/webp')wp=await decodeWebp(bytes,(p,c)=>busy(T('Datei wird verarbeitet…'),p,c+' '+T('Bilder')));
  if(wp){W=wp.W;H=wp.H;frames=wp.frames}
  else if(mime=='image/gif'){const m=T('GIF wird dekodiert…'),g=await decodeGif(bytes,(p,c)=>busy(m,p*.8,c+' '+T('Bilder')));W=g.W;H=g.H;const n=g.frames.length;for(let i=0;i<n;i++){const f=g.frames[i];frames.push({cv:mk(f.a,W,H),delay:f.delay});f.a=null;if(i%4==3){busy(m,.8+.2*i/n,`${i+1}/${n} ${T('Bilder')}`);await paint()}}}
- else if(mime.startsWith('video/')){busy(T('Video wird vorbereitet…'));const v=document.createElement('video'),vu=URL.createObjectURL(new Blob([bytes],{type:mime}));v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='auto';v.style.cssText='position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none';document.body.append(v);v.src=vu;
+ else if(mime.startsWith('video/')){busy(T('Video wird vorbereitet…'));const v=document.createElement('video'),vu=URL.createObjectURL(new Blob([bytes],{type:mime}));v.muted=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='auto';v.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1';document.body.append(v);v.src=vu;
   const bad=()=>Error(T('Dieses Video-Format kann der Browser nicht lesen (z. B. HEVC/H.265 vom Handy). Bitte in den Kameraeinstellungen „Maximale Kompatibilität“ / H.264 wählen oder das Video umwandeln.'));
   try{await new Promise((r,j)=>{v.onloadedmetadata=r;v.onerror=()=>j(bad());setTimeout(()=>j(bad()),20000)});
   if(!v.videoWidth||!v.videoHeight)throw bad();
@@ -522,10 +522,10 @@ async function loadSource0(bytes,mime,name){
   if(v.readyState<2)throw bad();
   const seek=t=>new Promise(r=>{let d=false;const fin=()=>{if(!d){d=true;r()}};if(Math.abs(v.currentTime-t)<.001){setTimeout(fin,60);return}v.addEventListener('seeked',()=>setTimeout(fin,40),{once:true});setTimeout(fin,3000);v.currentTime=t});
   let dur=v.duration,tail=false;if(!Number.isFinite(dur)||!(dur>0)){dur=await vDur(v);try{v.currentTime=0}catch(e){}if(!(dur>0)){dur=30;tail=true}}
-  const sc=Math.min(1,480/v.videoWidth);W=Math.round(v.videoWidth*sc);H=Math.round(v.videoHeight*sc);const n=Math.min(matchMedia('(pointer:coarse)').matches?150:300,Math.max(1,Math.floor(dur*10)||1));
-  for(let i=0;i<n;i++){busy(T('Video wird in Bilder umgewandelt…'),i/n,`${i+1}/${n} ${T('Bilder')}`);await seek(i/10);const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(v,0,0,W,H);
+  const sc=Math.min(1,480/v.videoWidth);W=Math.round(v.videoWidth*sc);H=Math.round(v.videoHeight*sc);const maxN=matchMedia('(pointer:coarse)').matches?150:300;let rf=0;if(!tail){busy(T('Video wird vorbereitet…'));try{rf=await vFps(v)}catch(e){}try{await seek(0)}catch(e){}}let r=rf>=1?Math.min(rf,30):10;if(dur*r>maxN)r=Math.max(10,maxN/dur);const n=Math.min(maxN,Math.max(1,Math.floor(dur*r)||1));
+  for(let i=0;i<n;i++){busy(T('Video wird in Bilder umgewandelt…'),i/n,`${i+1}/${n} ${T('Bilder')}`);await seek(i/r);const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(v,0,0,W,H);
    if(i==0){let ok=false;for(let t=0;t<3&&!ok;t++){if(t){await new Promise(r=>setTimeout(r,300));x.drawImage(v,0,0,W,H)}const d=x.getImageData(0,0,W,H).data;for(let q=3;q<d.length;q+=388)if(d[q]){ok=true;break}}if(!ok)throw bad()}
-   frames.push({cv:c,delay:100})}
+   frames.push({cv:c,delay:Math.round(1000/r)})}
   if(tail){const sg=cc=>{const t=document.createElement('canvas');t.width=t.height=8;const q=t.getContext('2d',{willReadFrequently:true});q.drawImage(cc,0,0,8,8);return q.getImageData(0,0,8,8).data.join()};let k=frames.length-1;const s=sg(frames[k].cv);while(k>0&&sg(frames[k-1].cv)==s)k--;frames.length=k+1}}
   finally{URL.revokeObjectURL(vu);v.remove()}}
  else{busy(T('Bild wird geladen…'));const bm=await createImageBitmap(new Blob([bytes],{type:mime}));W=bm.width;H=bm.height;const c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(bm,0,0);frames=[{cv:c,delay:100}]}
@@ -936,7 +936,8 @@ const fmtSave=()=>{try{localStorage.setItem('of',JSON.stringify(OF))}catch(e){}}
  wMime=()=>{try{return typeof MediaRecorder=='function'&&HTMLCanvasElement.prototype.captureStream?(['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||''):''}catch(e){return''}},
  u32=n=>[n&255,n>>8&255,n>>16&255,n>>>24&255],u24=n=>[n&255,n>>8&255,n>>16&255],tag=s=>[...s].map(c=>c.charCodeAt(0)),
  cat=(...a)=>{const o=new Uint8Array(a.reduce((s,x)=>s+x.length,0));let p=0;for(const x of a){o.set(x,p);p+=x.length}return o};
-CAP.webm=!!wMime();
+const WCAPI=typeof VideoEncoder=='function'&&typeof VideoFrame=='function';
+CAP.webm=!!wMime()||WCAPI;
 try{const c0=document.createElement('canvas');c0.width=c0.height=2;c0.toBlob(b=>{CAP.webp=!!b&&b.type=='image/webp';fmtUI()},'image/webp',.8)}catch(e){}
 /* WebP: RIFF lesen und animierte Dateien schreiben (Einzelbilder kommen aus canvas.toBlob) */
 function chunk(t,d){const a=new Uint8Array(8+d.length+(d.length&1));a.set(tag(t));a.set(u32(d.length),4);a.set(d,8);return a}
@@ -992,17 +993,77 @@ async function fixWebm(blob,ms){try{const o=patchWebm(new Uint8Array(await blob.
 async function recWebm(c,n,drawAt,durAt,qk,prog,chk){
  const mt=wMime();if(!mt)throw Error(T('Dein Browser kann dieses Format nicht erzeugen. Nutze aktuelles Chrome, Edge oder Firefox.'));
  let tot=0;for(let j=0;j<n;j++)tot+=durAt(j);
- const bps=Math.round(Math.max(2e5,Math.min(2.5e7,c.width*c.height*(n*1000/Math.max(1,tot))*QB[qk]))),st=c.captureStream(),rec=new MediaRecorder(st,{mimeType:mt,videoBitsPerSecond:bps}),ch=[];
+ const bps=Math.round(Math.max(2e5,Math.min(2.5e7,c.width*c.height*(n*1000/Math.max(1,tot))*QB[qk]))),st=capStream(c),rec=new MediaRecorder(st,{mimeType:mt,videoBitsPerSecond:bps}),ch=[];
  rec.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
  const done=new Promise((res,rej)=>{rec.onstop=()=>res();rec.onerror=e=>rej((e&&e.error)||Error('WebM'))});
- try{await drawAt(0);rec.start(500);const t0=performance.now();let acc=0;
-  for(let j=0;j<n;j++){if(chk)chk();await drawAt(j);prog(j/n);acc+=durAt(j);await sleep(t0+acc-performance.now())}
+ try{await drawAt(0);st.__rf();rec.start(500);const t0=performance.now();let acc=0;
+  for(let j=0;j<n;j++){if(chk)chk();await drawAt(j);st.__rf();prog(j/n);acc+=durAt(j);await sleep(t0+acc-performance.now())}
   prog(1);await sleep(80)}
- catch(e){try{if(rec.state!='inactive')rec.stop()}catch(x){}st.getTracks().forEach(t=>t.stop());throw e}
+ catch(e){try{if(rec.state!='inactive')rec.stop()}catch(x){}st.getTracks().forEach(t=>t.stop());c.remove();throw e}
  try{if(rec.state!='inactive'){try{rec.requestData()}catch(x){}rec.stop()}}catch(x){}
- await Promise.race([done,sleep(5000)]);st.getTracks().forEach(t=>t.stop());
+ await Promise.race([done,sleep(5000)]);st.getTracks().forEach(t=>t.stop());c.remove();
  const bl=new Blob(ch,{type:'video/webm'});if(!bl.size)throw Error('WebM: no data');
  return fixWebm(bl,tot)}
+/* WebM schreiben: eigener Muxer, die Bilder kommen aus WebCodecs (VP9/VP8). Kein Echtzeit-Abfilmen: genaue Bildzeiten, schneller als der Clip, auch im Hintergrund-Tab */
+const U8=x=>x instanceof Uint8Array?x:Uint8Array.from(x),
+ ebId=id=>{const a=[];while(id>0){a.unshift(id&255);id=Math.floor(id/256)}return a},
+ ebSz=n=>{let l=1;while(l<8&&n>=Math.pow(2,7*l)-1)l++;const a=new Array(l);let v=n;for(let i=l-1;i>=0;i--){a[i]=v%256;v=Math.floor(v/256)}a[0]|=1<<(8-l);return a},
+ ebEl=(id,...p)=>{const d=cat(...p.map(U8));return cat(Uint8Array.from(ebId(id)),Uint8Array.from(ebSz(d.length)),d)},
+ ebUint=(id,v,w)=>{const a=[];if(w){for(let i=w-1;i>=0;i--)a.push(Math.floor(v/Math.pow(2,8*i))&255)}else{do{a.unshift(v%256);v=Math.floor(v/256)}while(v>0)}return ebEl(id,a)},
+ ebFloat=(id,v)=>{const b=new Uint8Array(8);new DataView(b.buffer).setFloat64(0,v,false);return ebEl(id,b)},
+ ebStr=(id,s)=>ebEl(id,tag(s));
+function webmMux(fr,w,h,codec,totMs,fps){
+ const hdr=ebEl(0x1A45DFA3,ebUint(0x4286,1),ebUint(0x42F7,1),ebUint(0x42F2,4),ebUint(0x42F3,8),ebStr(0x4282,'webm'),ebUint(0x4287,4),ebUint(0x4285,2)),
+  info=ebEl(0x1549A966,ebUint(0x2AD7B1,1000000),ebFloat(0x4489,totMs),ebStr(0x4D80,'OrcaGif'),ebStr(0x5741,'OrcaGif')),
+  te=[ebUint(0xD7,1),ebUint(0x73C5,1),ebUint(0x83,1),ebUint(0x9C,0),ebStr(0x86,codec)];
+ if(fps)te.push(ebUint(0x23E383,Math.round(1e9/fps)));
+ te.push(ebEl(0xE0,ebUint(0xB0,w),ebUint(0xBA,h)));
+ const tracks=ebEl(0x1654AE6B,ebEl(0xAE,...te)),cls=[];let cu=null;
+ for(const f of fr){if(!cu||f.key||f.t-cu.t>30000){cu={t:f.t,key:f.key,bl:[]};cls.push(cu)}
+  const rel=f.t-cu.t;cu.bl.push(ebEl(0xA3,[0x81,rel>>8&255,rel&255,f.key?0x80:0],f.b))}
+ const ce=cls.map(c=>ebEl(0x1F43B675,ebUint(0xE7,c.t),...c.bl)),
+  seek=(a,b,c)=>ebEl(0x114D9B74,...[[0x1549A966,a],[0x1654AE6B,b],[0x1C53BB6B,c]].map(([i,p])=>ebEl(0x4DBB,ebEl(0x53AB,ebId(i)),ebUint(0x53AC,p,4)))),
+  cues=base=>{let o=0;return ebEl(0x1C53BB6B,...cls.map((c,i)=>{const e=c.key?ebEl(0xBB,ebUint(0xB3,c.t,4),ebEl(0xB7,ebUint(0xF7,1),ebUint(0xF1,base+o,4))):null;o+=ce[i].length;return e}).filter(Boolean))},
+  sl=seek(0,0,0).length,cl0=cues(0).length,base=sl+info.length+tracks.length+cl0,
+  parts=[seek(sl,sl+info.length,sl+info.length+tracks.length),info,tracks,cues(base),...ce],
+  size=parts.reduce((s,x)=>s+x.length,0);
+ return new Blob([hdr,Uint8Array.from(ebId(0x18538067)),Uint8Array.from(ebSz(size)),...parts],{type:'video/webm'})}
+async function wcWebm(c,n,drawAt,durAt,qk,prog,chk){
+ let tot=0,same=true;for(let j=0;j<n;j++){const d=durAt(j);tot+=d;if(Math.abs(d-durAt(0))>.01)same=false}
+ const w=c.width,h=c.height,fps=n*1000/Math.max(1,tot),bps=Math.round(Math.max(2e5,Math.min(2.5e7,w*h*fps*QB[qk])));
+ let cfg=null,cid='';
+ for(const[cd,id]of[['vp09.00.41.08','V_VP9'],['vp09.00.51.08','V_VP9'],['vp09.00.61.08','V_VP9'],['vp8','V_VP8']]){
+  const t={codec:cd,width:w,height:h,bitrate:bps,framerate:Math.max(1,fps),latencyMode:'quality'};
+  try{const s=await VideoEncoder.isConfigSupported(t);if(s&&s.supported){cfg=t;cid=id;break}}catch(e){}}
+ if(!cfg)return null;
+ const out=[];let err=null;
+ const enc=new VideoEncoder({output:ch=>{const b=new Uint8Array(ch.byteLength);ch.copyTo(b);out.push({b,t:Math.round(ch.timestamp/1000),key:ch.type=='key'})},error:e=>{err=e}});
+ try{
+  enc.configure(cfg);let acc=0,lk=-1e9;
+  for(let j=0;j<n;j++){
+   if(chk)chk();if(err)throw err;
+   await drawAt(j);
+   const d=durAt(j),vf=new VideoFrame(c,{timestamp:Math.round(acc*1000),duration:Math.round(d*1000)}),key=j==0||acc-lk>=2000;
+   if(key)lk=acc;
+   try{enc.encode(vf,{keyFrame:key})}finally{vf.close()}
+   acc+=d;prog((j+1)/n);
+   while(enc.encodeQueueSize>6&&!err)await sleep(4);
+   if(j%6==5)await sleep(0)}
+  await enc.flush();if(err)throw err}
+ finally{try{if(enc.state!='closed')enc.close()}catch(e){}}
+ if(!out.length)throw Error('WebM: no data');
+ out.sort((a,b)=>a.t-b.t);
+ const bl=webmMux(out,w,h,cid,tot,same?fps:0);
+ if(!(await webmOK(bl)))throw Error('WebM-Pruefung fehlgeschlagen');
+ return bl}
+/* WebM erzeugen: erst per WebCodecs (genau), sonst Notlösung per MediaRecorder (Echtzeit) */
+async function makeWebm(c,n,drawAt,durAt,qk,prog,chk){
+ if(WCAPI){try{const b=await wcWebm(c,n,drawAt,durAt,qk,prog,chk);if(b)return b}catch(e){if(e===VABORT)throw e;console.warn('WebCodecs fehlgeschlagen, nutze MediaRecorder:',e)}}
+ return recWebm(c,n,drawAt,durAt,qk,prog,chk)}
+/* Canvas für MediaRecorder: im Dokument anhängen und Bilder von Hand anfordern (sonst liefert Firefox unregelmäßig Bilder) */
+function capStream(c){c.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1';document.body.appendChild(c);
+ let st=c.captureStream(0),tk=st.getVideoTracks()[0];if(!(tk&&typeof tk.requestFrame=='function')){st.getTracks().forEach(t=>t.stop());st=c.captureStream();tk=null}
+ st.__rf=()=>{if(tk){try{tk.requestFrame()}catch(e){}}};return st}
 function showMedia(img,vid,url,f){try{if(f=='webm'){img.style.display='none';const nv=document.createElement('video');nv.id=vid.id;nv.muted=true;nv.defaultMuted=true;nv.loop=true;nv.autoplay=true;nv.controls=true;nv.playsInline=true;nv.setAttribute('playsinline','');nv.onerror=()=>console.warn('Vorschau: Video konnte nicht geladen werden',nv.error);vid.replaceWith(nv);nv.src=url;try{const p=nv.play();if(p&&p.catch)p.catch(()=>{})}catch(e){console.warn(e)}}else{try{vid.pause()}catch(e){}vid.removeAttribute('src');vid.style.display='none';img.style.display='';img.src=url}}catch(e){console.error(e)}}
 function showRes(f,blob,url){lastBlob=blob;lastF=f;const a=$('#rd');a.href=url;a.download=(P&&P.name||'animation')+'.'+EXT[f][0];a.firstElementChild.textContent=T(f=='gif'?'GIF herunterladen':f=='webp'?'WebP herunterladen':'WebM herunterladen');showMedia($('#ri'),$('#rv'),url,f);setTimeout(()=>{try{$('#res').scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}},80)}
 /* Editor: WebP / WebM erzeugen */
@@ -1015,7 +1076,7 @@ async function exportAlt(fm){
    for(let j=0;j<q.length;j++){vChk();render(x,q[j],w,h,null,pl[j].lf);const b=await toBlobP(c,'image/webp',QW[OF.q]);fl.push({b:new Uint8Array(await b.arrayBuffer()),d:Math.max(20,Math.round(pl[j].d))});busy(msg,(j+1)/q.length,'',true);if(j%3==0)await tick()}
    blob=webpBuild(fl,w,h,!!tp)}
   else{P.transp=false;const msg=T('WebM wird aufgenommen…');busy(msg,0,'',true);await paint();
-   blob=await recWebm(c,q.length,j=>render(x,q[j],w,h,null,pl[j].lf),j=>pl[j].d,OF.q,p=>busy(msg,p,T('Tab im Vordergrund lassen'),true),vChk)}
+   blob=await makeWebm(c,q.length,j=>render(x,q[j],w,h,null,pl[j].lf),j=>pl[j].d,OF.q,p=>busy(msg,p,T('Tab im Vordergrund lassen'),true),vChk)}
  }catch(e){if(e!==VABORT){console.error(e);alert(T('Fehler:')+' '+(e&&e.message||e))}}
  finally{P.transp=tp;busyOff()}
  if(!blob)return;
@@ -1025,18 +1086,18 @@ async function exportAlt(fm){
 async function vMake(p,t0,fm,wm){
  const v=vEl(),isW=fm=='webp',c=document.createElement('canvas');c.width=p.w;c.height=p.h;const x=c.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
  if(wm){try{await document.fonts.load('bold 20px OrcaWM')}catch(e){}}
- const mt=isW?'image/webp':'image/jpeg',qv=isW?QW[OF.q]:.92,fr=[],n=p.n,msg=T('Video wird in Bilder umgewandelt…');
+ const mt=isW?'image/webp':'image/jpeg',qv=isW?QW[OF.q]:.92,fr=[],fps2=Math.max(1,Math.min(50,+$('#vF').value||15)),stp=isW?p.cs/100:1/fps2,n=isW?p.n:Math.max(1,Math.round((V.t1-t0)/stp)),msg=T('Video wird in Bilder umgewandelt…');
  const grab=()=>{x.drawImage(v,0,0,p.w,p.h);if(wm)wmDraw(x,p.w,p.h,wm);return toBlobP(c,mt,qv)};
- await vCap(v,t0,n,p.cs/100,grab,fr,k=>{if(k%2==0||k>=n)busy(msg,k/n*(isW?1:.5),`${k}/${n} ${T('Bilder')} · ${T('Tab im Vordergrund lassen')}`,!vAbort)});
+ await vCap(v,t0,n,stp,grab,fr,k=>{if(k%2==0||k>=n)busy(msg,k/n*(isW?1:.5),`${k}/${n} ${T('Bilder')} · ${T('Tab im Vordergrund lassen')}`,!vAbort)});
  vChk();
  const bl=await Promise.all(fr),fl=[];
- for(const b of bl){const L=fl[fl.length-1];if(L&&L.b===b)L.d+=p.cs*10;else fl.push({b,d:p.cs*10})}
+ if(isW){for(const b of bl){const L=fl[fl.length-1];if(L&&L.b===b)L.d+=p.cs*10;else fl.push({b,d:p.cs*10})}}else for(const b of bl)fl.push({b,d:1000/fps2});
  V.W=p.w;V.H=p.h;V.nfr=n;
  if(isW){busy(T('WebP wird kodiert…'),null,'',!vAbort);await paint();const m=new Map();
   for(const f of fl){if(!m.has(f.b))m.set(f.b,new Uint8Array(await f.b.arrayBuffer()));f.u=m.get(f.b)}
   return webpBuild(fl.map(f=>({b:f.u,d:f.d})),p.w,p.h,false)}
  const w2=Math.max(2,p.w&~1),h2=Math.max(2,p.h&~1),c2=document.createElement('canvas');c2.width=w2;c2.height=h2;const x2=c2.getContext('2d'),msg2=T('WebM wird aufgenommen…');
- return recWebm(c2,fl.length,async j=>{const bm=await createImageBitmap(fl[j].b);x2.drawImage(bm,0,0,w2,h2);if(bm.close)bm.close()},j=>fl[j].d,OF.q,pr=>busy(msg2,pr,T('Tab im Vordergrund lassen'),!vAbort),vChk)}
+ return makeWebm(c2,fl.length,async j=>{const bm=await createImageBitmap(fl[j].b);x2.drawImage(bm,0,0,w2,h2);if(bm.close)bm.close()},j=>fl[j].d,OF.q,pr=>busy(msg2,.5+pr/2,T('Tab im Vordergrund lassen'),!vAbort),vChk)}
 /* Format-Auswahl (unter dem Erzeugen-Knopf, in beiden Tabs gleich) */
 const FMTS=[['gif','GIF'],['webp','WebP'],['webm','WebM']],
  FH={gif:'Läuft überall, aber die Datei wird größer.',webp:'Viel kleiner als GIF, mit schöneren Farben und echter Transparenz. Aktuelle Browser zeigen es an, manche ältere Programme nicht.',webm:'Kleinste Datei und flüssig – aber ein Video, kein Bild: ohne Transparenz, und das Erzeugen dauert länger als der Clip.'},
