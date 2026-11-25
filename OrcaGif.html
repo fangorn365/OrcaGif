@@ -99,7 +99,7 @@ textarea.flash{box-shadow:0 0 0 3px var(--a)}
 <h2>How to make a GIF from a video</h2>
 <ol><li>Click the “Video to GIF” tab at the top of the page.</li><li>Click the file button on the left and choose a video from your device. It is not uploaded anywhere.</li><li>Choose the part you want: drag on the bar under the video, or type a start and end time. Short clips of 2–6 seconds work best.</li><li>Set “Output width” (how wide the GIF is; 480 is a good start) and “FPS” (pictures per second; 15 looks smooth). Smaller numbers make a smaller file.</li><li>Choose GIF, WebP or WebM (not sure? keep GIF) and press the blue button. Wait until the bar is full.</li><li>Press the blue download button. For a GIF you can first press “Edit in GIF Editor” to add text.</li></ol>
 <h2>Change a GIF you already have</h2>
-<ol><li>Open the “GIF Editor” tab and choose your file on the left: a GIF, picture, video, WebP or WebM. Dragging the file into the window works too.</li><li>Press ▶ to play. Move the slider to look at single pictures (called frames).</li><li>Under “Edit” you can cut and change it: “Start frame” and “End frame” cut off the beginning or end, “Speed ×” makes it faster or slower, “Reverse” plays it backwards.</li><li>“Output width (px)” changes the size. Made a mistake? Press “Undo” at the top.</li><li>Choose GIF, WebP or WebM, press the blue button and download the result. “Save” keeps your work in this browser so you can continue later.</li></ol>
+<ol><li>Open the “GIF Editor” tab and choose your file on the left: a GIF, picture, video, WebP or WebM. Dragging the file into the window works too.</li><li>Press ▶ to play. Move the slider to look at single pictures (called frames).</li><li>Under “Edit” you can cut and change it: “Start frame” and “End frame” cut off the beginning or end, “Speed ×” makes it faster or slower, “Reverse” plays it backwards.</li><li>“Output width (px)” changes the size. Made a mistake? Press “Undo” at the top.</li><li>“✂ Crop” above the preview shows the whole GIF in the middle. Drag the edges of the bright frame to cut, or drag inside it to move it. Press “✂ Crop” again to go back to the normal preview.</li><li>Choose GIF, WebP or WebM, press the blue button and download the result. “Save” keeps your work in this browser so you can continue later.</li></ol>
 <h2>Add text, pictures and drawings</h2>
 <ul><li>“+ Text” puts words on your GIF. Type them in the box on the left, choose font, size and colour, and drag the text to the right place. Double-click the text in the picture to edit it again.</li><li>“+ Image” adds your own picture, for example a logo. “✏️ Draw” lets you draw with the mouse or your finger. Press it again to stop drawing.</li><li>Every text, picture or drawing is a “layer”. Click a layer in the list to select it. ▲ ▼ move it up or down, ✕ deletes it.</li><li>“Visible from frame” and “to frame” decide when a layer is shown.</li></ul>
 <h2>Make things move</h2>
@@ -136,6 +136,7 @@ textarea.flash{box-shadow:0 0 0 3px var(--a)}
 <label>Ausgabebreite (px)<input type="number" id="ow" min="1"></label>
 <small>Zuschneiden (Quellpixel):</small>
 <div class="r4"><input type="number" id="cx" title="x"><input type="number" id="cy" title="y"><input type="number" id="cw" title="Breite"><input type="number" id="ch" title="Höhe"></div>
+<canvas id="crc" style="display:none;width:100%;max-width:340px;height:auto;touch-action:none;cursor:crosshair;border-radius:6px;margin:4px 0"></canvas>
 <h3>Ebenen</h3>
 <div class="bar"><button id="aTxt">+ Text</button><button id="aImg">+ Bild</button><button id="aDr">✏️ Zeichnen</button></div>
 <div id="dr" style="display:none" class="r"><label>Farbe<input type="color" id="dc" value="#ff0000"></label><label>Dicke %<input type="number" id="dw" value="1" step="0.5" min="0.2"></label></div>
@@ -156,7 +157,7 @@ textarea.flash{box-shadow:0 0 0 3px var(--a)}
 </aside>
 <div id="asb" class="ew"><div id="asbt"></div></div>
 <main class="ew">
-<div id="tbar"><button id="bUndo" title="Rückgängig (Strg+Z)">↶ Zurück</button><button id="bRedo" title="Wiederholen (Strg+Y)">Wiederholen ↷</button></div>
+<div id="tbar"><button id="bUndo" title="Rückgängig (Strg+Z)">↶ Zurück</button><button id="bRedo" title="Wiederholen (Strg+Y)">Wiederholen ↷</button><button id="bCrop">✂ Zuschneiden</button></div>
 <div id="stage"><canvas id="cv" width="400" height="300"></canvas></div>
 <div id="tl"><button id="bPlay">▶</button><div style="flex:1"><input type="range" id="sl" min="0" max="0" value="0" style="width:100%"><div id="kfs"></div></div><span id="fl2">–</span></div>
 </main>
@@ -291,6 +292,8 @@ const RAW=[
 "Wiederholen ↷ | Redo ↷ | Rétablir ↷ | Rehacer ↷ | إعادة ↷ | फिर से करें ↷ | 重做 ↷ | পুনরায় করুন ↷ | Refazer ↷ | Ulangi ↷",
 "Rückgängig (Strg+Z) | Undo (Ctrl+Z) | Annuler (Ctrl+Z) | Deshacer (Ctrl+Z) | تراجع (Ctrl+Z) | पूर्ववत (Ctrl+Z) | 撤销 (Ctrl+Z) | পূর্বাবস্থা (Ctrl+Z) | Desfazer (Ctrl+Z) | Urungkan (Ctrl+Z)",
 "Wiederholen (Strg+Y) | Redo (Ctrl+Y) | Rétablir (Ctrl+Y) | Rehacer (Ctrl+Y) | إعادة (Ctrl+Y) | फिर से करें (Ctrl+Y) | 重做 (Ctrl+Y) | পুনরায় করুন (Ctrl+Y) | Refazer (Ctrl+Y) | Ulangi (Ctrl+Y)",
+"✂ Zuschneiden | ✂ Crop | ✂ Recadrer | ✂ Recortar | ✂ قص | ✂ क्रॉप | ✂ 裁剪 | ✂ ক্রপ | ✂ Cortar | ✂ Pangkas",
+"„✂ Zuschneiden“ oberhalb der Vorschau zeigt das ganze GIF in der Mitte. Ziehe die Kanten des hellen Rahmens zum Zuschneiden oder innen, um ihn zu verschieben. Drücke „✂ Zuschneiden“ erneut, um zur normalen Vorschau zurückzukehren. | “✂ Crop” above the preview shows the whole GIF in the middle. Drag the edges of the bright frame to cut, or drag inside it to move it. Press “✂ Crop” again to go back to the normal preview. | « ✂ Recadrer » au-dessus de l’aperçu affiche le GIF entier au centre. Faites glisser les bords du cadre clair pour découper, ou l’intérieur pour le déplacer. Cliquez de nouveau sur « ✂ Recadrer » pour revenir à l’aperçu normal. | «✂ Recortar» encima de la vista previa muestra el GIF completo en el centro. Arrastra los bordes del marco claro para recortar, o su interior para moverlo. Pulsa «✂ Recortar» de nuevo para volver a la vista previa normal. | «✂ قص» فوق المعاينة يعرض ملف GIF كاملًا في المنتصف. اسحب حواف الإطار الفاتح للقص، أو داخله لتحريكه. انقر على «✂ قص» مرة أخرى للعودة إلى المعاينة العادية. | प्रीव्यू के ऊपर “✂ क्रॉप” GIF को बीच में पूरा दिखाता है। काटने के लिए चमकीले फ़्रेम के किनारे खींचें, या हिलाने के लिए अंदर से खींचें। सामान्य प्रीव्यू पर लौटने के लिए “✂ क्रॉप” फिर से दबाएँ। | 预览上方的“✂ 裁剪”会在中央显示整个 GIF。拖动亮框的边缘可裁切，拖动框内可移动。再次点击“✂ 裁剪”即可回到普通预览。 | প্রিভিউয়ের ওপরের “✂ ক্রপ” পুরো GIF-টি মাঝখানে দেখায়। কাটতে উজ্জ্বল ফ্রেমের ধার টানুন, সরাতে ভেতরে টানুন। সাধারণ প্রিভিউয়ে ফিরতে আবার “✂ ক্রপ” চাপুন। | “✂ Cortar” acima da prévia mostra o GIF inteiro no centro. Arraste as bordas da moldura clara para cortar, ou o interior para movê-la. Clique em “✂ Cortar” de novo para voltar à prévia normal. | “✂ Pangkas” di atas pratinjau menampilkan seluruh GIF di tengah. Seret tepi bingkai terang untuk memangkas, atau seret di dalamnya untuk memindahkan. Tekan “✂ Pangkas” lagi untuk kembali ke pratinjau biasa.",
 "Original hat | Original has | L'original a | El original tiene | الأصل يحتوي على | मूल में | 原始为 | মূল ফাইলে | O original tem | Aslinya",
 "animiert | animated | animé | animada | متحركة | एनिमेटेड | 带动画 | অ্যানিমেটেড | animada | beranimasi",
 "Bildebene | Image layer | Calque d'image | Capa de imagen | طبقة صورة | इमेज लेयर | 图片图层 | ছবির লেয়ার | Camada de imagem | Lapisan gambar",
@@ -601,8 +604,66 @@ async function play(){if(!S)return;playing=!playing;$('#bPlay').textContent=play
 $('#bPlay').onclick=play;
 
 /* ---------- UI-Felder ---------- */
-const F={ta:v=>P.trim[0]=Math.max(0,Math.min(v-1,P.trim[1])),tb:v=>P.trim[1]=Math.min(S.frames.length-1,Math.max(v-1,P.trim[0])),sp:v=>P.speed=Math.max(.1,v),ow:v=>P.outW=Math.max(1,v),cx:v=>P.crop[0]=Math.max(0,Math.min(v,S.W-1)),cy:v=>P.crop[1]=Math.max(0,Math.min(v,S.H-1)),cw:v=>P.crop[2]=Math.max(1,Math.min(v,S.W-P.crop[0])),ch:v=>P.crop[3]=Math.max(1,Math.min(v,S.H-P.crop[1]))};
+const F={ta:v=>P.trim[0]=Math.max(0,Math.min(v-1,P.trim[1])),tb:v=>P.trim[1]=Math.min(S.frames.length-1,Math.max(v-1,P.trim[0])),sp:v=>P.speed=Math.max(.1,v),ow:v=>P.outW=Math.max(1,v),cx:v=>setCrop(v,P.crop[1],P.crop[2],P.crop[3]),cy:v=>setCrop(P.crop[0],v,P.crop[2],P.crop[3]),cw:v=>setCrop(P.crop[0],P.crop[1],v,P.crop[3]),ch:v=>setCrop(P.crop[0],P.crop[1],P.crop[2],v)};
 for(const id in F)$('#'+id).oninput=e=>{if(!S||e.target.value==='')return;F[id](+e.target.value);draw()};
+const CRC=$('#crc'),MINC=4,CUR={l:'ew-resize',r:'ew-resize',t:'ns-resize',b:'ns-resize',tl:'nwse-resize',br:'nwse-resize',tr:'nesw-resize',bl:'nesw-resize',m:'move'};
+function setCrop(x,y,w,h){if(!S||!P||![x,y,w,h].every(Number.isFinite))return;const o=P.crop[2];w=Math.max(MINC,Math.min(Math.round(w),S.W));h=Math.max(MINC,Math.min(Math.round(h),S.H));x=Math.max(0,Math.min(Math.round(x),S.W-w));y=Math.max(0,Math.min(Math.round(y),S.H-h));P.crop=[x,y,w,h];if(w!==o){P.outW=w;$('#ow').value=w}}
+function syncCropUI(){if(!S||!P)return;[$('#cx').value,$('#cy').value,$('#cw').value,$('#ch').value]=P.crop;$('#ow').value=P.outW}
+let cropView=false,cropOc=null;
+ /* Zuschnitt-Ansicht in der Hauptvorschau: volles Bild, Ausschnitt hell, Rest abgedunkelt */
+ function drawCropView(){if(!S||!P)return;
+ const st=$('#stage'),fit=Math.min((st.clientWidth-24)/S.W,(st.clientHeight-24)/S.H)||1,sc=1/fit;
+ cv.width=S.W;cv.height=S.H;cv.style.width=Math.round(S.W*fit)+'px';cv.style.height=Math.round(S.H*fit)+'px';
+ const x=ctx,[cx,cy,cw,ch]=P.crop,f=S.frames[Math.min(cur,S.frames.length-1)];
+ x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.clearRect(0,0,S.W,S.H);
+ if(f)x.drawImage(f.cv,0,0,S.W,S.H);
+ x.fillStyle='rgba(0,0,0,.55)';x.fillRect(0,0,S.W,S.H);
+ x.save();x.beginPath();x.rect(cx,cy,cw,ch);x.clip();if(f)x.drawImage(f.cv,0,0,S.W,S.H);
+ if(!cropOc)cropOc=document.createElement('canvas');cropOc.width=cw;cropOc.height=ch;
+ render(cropOc.getContext('2d'),cur,cw,ch,[],playing&&cf!=null?cf:cur);
+ x.drawImage(cropOc,cx,cy,cw,ch);x.restore();
+ x.strokeStyle='#fff';x.lineWidth=2*sc;x.strokeRect(cx,cy,cw,ch);
+ const hs=8*sc;x.fillStyle='#fff';[[cx,cy],[cx+cw/2,cy],[cx+cw,cy],[cx,cy+ch/2],[cx+cw,cy+ch/2],[cx,cy+ch],[cx+cw/2,cy+ch],[cx+cw,cy+ch]].forEach(([a,b])=>x.fillRect(a-hs/2,b-hs/2,hs,hs))}
+function cropHit(p){const[cx,cy,cw,ch]=P.crop,t=10*p.k,dl=Math.abs(p.x-cx),dr=Math.abs(p.x-cx-cw),dt=Math.abs(p.y-cy),db=Math.abs(p.y-cy-ch),inX=p.x>=cx-t&&p.x<=cx+cw+t,inY=p.y>=cy-t&&p.y<=cy+ch+t;
+ let xm='',ym='';
+ if(inY&&Math.min(dl,dr)<=t)xm=dl<=dr?'l':'r';
+ if(inX&&Math.min(dt,db)<=t)ym=dt<=db?'t':'b';
+ if(xm||ym)return ym+xm;
+ return p.x>=cx&&p.x<=cx+cw&&p.y>=cy&&p.y<=cy+ch?'m':''}
+let cdrag=null;
+const cpt=e=>{const r=CRC.getBoundingClientRect(),k=S.W/r.width;return{x:(e.clientX-r.left)*k,y:(e.clientY-r.top)*k,k}};
+CRC.addEventListener('pointerdown',e=>{if(!S||!P||!CRC.clientWidth)return;const p=cpt(e),m=cropHit(p);if(!m)return;e.preventDefault();cdrag={m,x:p.x,y:p.y,c:[...P.crop]};CRC.setPointerCapture(e.pointerId)});
+CRC.addEventListener('pointermove',e=>{if(!S||!P||!CRC.clientWidth)return;const p=cpt(e);
+ if(!cdrag){CRC.style.cursor=CUR[cropHit(p)]||'default';return}
+ const[x0,y0,w0,h0]=cdrag.c,m=cdrag.m,dx=Math.round(p.x-cdrag.x),dy=Math.round(p.y-cdrag.y);
+ let x=x0,y=y0,w=w0,h=h0;
+ if(m=='m'){x=x0+dx;y=y0+dy}
+ else{
+  if(m.includes('l')){x=Math.max(0,Math.min(x0+dx,x0+w0-MINC));w=x0+w0-x}
+  if(m.includes('r'))w=Math.min(S.W-x0,Math.max(MINC,w0+dx));
+  if(m.includes('t')){y=Math.max(0,Math.min(y0+dy,y0+h0-MINC));h=y0+h0-y}
+  if(m.includes('b'))h=Math.min(S.H-y0,Math.max(MINC,h0+dy))}
+ setCrop(x,y,w,h);syncCropUI();draw()});
+const cEnd=()=>{cdrag=null};CRC.addEventListener('pointerup',cEnd);CRC.addEventListener('pointercancel',cEnd);
+for(const id of['cx','cy','cw','ch'])$('#'+id).onchange=syncCropUI;
+{const _dr=draw;draw=function(){_dr();if(cropView)drawCropView()}}
+/* Zuschnitt in der Hauptvorschau ziehen (nur wenn der Schalter „✂ Zuschneiden“ aktiv ist) */
+const cvpt=e=>{const r=cv.getBoundingClientRect(),k=S.W/r.width;return{x:(e.clientX-r.left)*k,y:(e.clientY-r.top)*k,k}};
+cv.addEventListener('pointerdown',e=>{if(!cropView||!S||!P)return;e.stopImmediatePropagation();const p=cvpt(e),m=cropHit(p);if(!m)return;e.preventDefault();cdrag={m,x:p.x,y:p.y,c:[...P.crop]};cv.setPointerCapture(e.pointerId)},true);
+cv.addEventListener('pointermove',e=>{if(!cropView||!S||!P)return;e.stopImmediatePropagation();const p=cvpt(e);
+ if(!cdrag){cv.style.cursor=CUR[cropHit(p)]||'default';return}
+ const[x0,y0,w0,h0]=cdrag.c,m=cdrag.m,dx=Math.round(p.x-cdrag.x),dy=Math.round(p.y-cdrag.y);
+ let x=x0,y=y0,w=w0,h=h0;
+ if(m=='m'){x=x0+dx;y=y0+dy}
+ else{
+  if(m.includes('l')){x=Math.max(0,Math.min(x0+dx,x0+w0-MINC));w=x0+w0-x}
+  if(m.includes('r'))w=Math.min(S.W-x0,Math.max(MINC,w0+dx));
+  if(m.includes('t')){y=Math.max(0,Math.min(y0+dy,y0+h0-MINC));h=y0+h0-y}
+  if(m.includes('b'))h=Math.min(S.H-y0,Math.max(MINC,h0+dy))}
+ setCrop(x,y,w,h);syncCropUI();draw()},true);
+const cvEnd=()=>{cdrag=null};cv.addEventListener('pointerup',cvEnd);cv.addEventListener('pointercancel',cvEnd);
+for(const ev of['click','dblclick','wheel'])cv.addEventListener(ev,e=>{if(cropView)e.stopImmediatePropagation()},true);
+$('#bCrop').onclick=()=>{if(!S)return alert(T('Bitte zuerst ein GIF laden.'));cropView=!cropView;cv.style.height='';$('#bCrop').classList.toggle('pri',cropView);cv.style.cursor='';draw()};
 const wmo=()=>P.wm||(P.wm={on:true,text:'OrcaGif',pos:'br'});
 $('#wmOn').onchange=e=>{if(P){wmo().on=e.target.checked;draw()}};$('#wmText').oninput=e=>{if(P){wmo().text=e.target.value;draw()}};$('#wmPos').onchange=e=>{if(P){wmo().pos=e.target.value;draw()}};
 $('#fps').oninput=e=>{if(P)P.fps=Math.max(0,Math.min(50,+e.target.value||0))};

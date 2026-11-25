@@ -32,6 +32,12 @@ Transforme um vídeo em GIF, edite um GIF que você já tem ou salve o resultado
 3. Em **Editar**: **Quadro inicial** / **Quadro final** cortam o começo ou o fim, **Velocidade ×** deixa mais rápido ou mais lento, **Inverter** toca de trás para frente, **FPS** (máx. 50) e **Largura de saída** mudam a fluidez e o tamanho, **Cortar** recorta a imagem.
 4. Escolha o tipo de arquivo, clique no botão azul e baixe o resultado. Errou? Clique em **Desfazer** no topo.
 
+## Cortar um GIF
+1. Abra um GIF na guia **🎨 Editor de GIF**.
+2. Clique em **✂ Cortar** acima da prévia. O GIF inteiro aparece no centro: a parte que fica está clara e o resto escurecido.
+3. Arraste uma borda ou um canto da moldura clara para cortar. Arraste dentro da moldura para movê-la. Os números ao lado de **Cortar** e **Largura de saída** acompanham automaticamente.
+4. Clique em **✂ Cortar** de novo para voltar à prévia normal. Enquanto corta, as camadas fora da moldura ficam ocultas.
+
 ## Adicionar texto, imagens e desenhos
 - **+ Texto** coloca palavras sobre o seu GIF. Digite-as na caixa à esquerda, escolha fonte, tamanho e cor e arraste o texto para o lugar certo. **Dê um clique duplo no texto na imagem para editá-lo de novo** (ou clique duas vezes nele na lista de camadas).
 - **+ Imagem** adiciona uma imagem sua, por exemplo um logotipo. **✏️ Desenhar** permite desenhar com o mouse ou o dedo.

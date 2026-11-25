@@ -32,6 +32,12 @@ Turn a video into a GIF, change a GIF you already have, or save your result as a
 3. Under **Edit**: **Start frame** / **End frame** cut off the beginning or end, **Speed** makes it faster or slower, **Reverse** plays it backwards, **FPS** (max. 50) and **Output width** change smoothness and size, **Crop** cuts the picture.
 4. Choose the file type, press the blue button and download the result. Made a mistake? Press **Undo** at the top.
 
+## Crop a GIF
+1. Open a GIF in the **🎨 GIF Editor** tab.
+2. Click **✂ Crop** above the preview. The whole GIF appears in the middle: the part you keep is bright, the rest is dimmed.
+3. Drag an edge or a corner of the bright frame to cut. Drag inside the frame to move it. The numbers next to **Crop** and **Output width** follow automatically.
+4. Click **✂ Crop** again to go back to the normal preview. While cropping, layers outside the frame are hidden.
+
 ## Add text, pictures and drawings
 - **+ Text** puts words on your GIF. Type them in the box on the left, choose font, size and colour, and drag the text to the right place. **Double-click the text in the picture to edit it again** (or double-click it in the layer list).
 - **+ Image** adds your own picture, for example a logo. **✏️ Draw** lets you draw with the mouse or your finger.

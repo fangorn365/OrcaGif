@@ -32,6 +32,12 @@ Transformez une vidéo en GIF, modifiez un GIF que vous avez déjà ou enregistr
 3. Sous **Modifier** : **Image de début** / **Image de fin** suppriment le début ou la fin, **Vitesse ×** accélère ou ralentit, **Inverser** lit à l’envers, **FPS** (max. 50) et **Largeur de sortie** changent la fluidité et la taille, **Recadrer** découpe l’image.
 4. Choisissez le type de fichier, appuyez sur le bouton bleu et téléchargez le résultat. Une erreur ? Appuyez sur **Annuler** en haut.
 
+## Recadrer un GIF
+1. Ouvrez un GIF dans l’onglet **🎨 Éditeur GIF**.
+2. Cliquez sur **✂ Recadrer** au-dessus de l’aperçu. Le GIF entier apparaît au centre : la partie conservée est claire, le reste est assombri.
+3. Faites glisser un bord ou un coin du cadre clair pour découper. Faites glisser à l’intérieur du cadre pour le déplacer. Les valeurs à côté de **Recadrer** et **Largeur de sortie** suivent automatiquement.
+4. Cliquez à nouveau sur **✂ Recadrer** pour revenir à l’aperçu normal. Pendant le recadrage, les calques situés hors du cadre sont masqués.
+
 ## Ajouter du texte, des images et des dessins
 - **+ Texte** ajoute des mots sur votre GIF. Saisissez-les dans la zone à gauche, choisissez police, taille et couleur, puis faites glisser le texte au bon endroit. **Double-cliquez sur le texte dans l’image pour le modifier à nouveau** (ou double-cliquez dessus dans la liste des calques).
 - **+ Image** ajoute votre propre image, par exemple un logo. **✏️ Dessiner** permet de dessiner à la souris ou au doigt.

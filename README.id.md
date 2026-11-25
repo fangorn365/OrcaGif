@@ -32,6 +32,12 @@ Ubah video menjadi GIF, edit GIF yang sudah Anda punya, atau simpan hasilnya seb
 3. Di bagian **Edit**: **Bingkai awal** / **Bingkai akhir** memotong bagian awal atau akhir, **Kecepatan ×** membuatnya lebih cepat atau lambat, **Balik** memutarnya mundur, **FPS** (maks. 50) dan **Lebar keluaran** mengubah kemulusan dan ukuran, **Pangkas** memotong gambar.
 4. Pilih jenis file, tekan tombol biru, lalu unduh hasilnya. Salah langkah? Tekan **Urungkan** di bagian atas.
 
+## Memangkas GIF
+1. Buka GIF di tab **🎨 Editor GIF**.
+2. Klik **✂ Pangkas** di atas pratinjau. Seluruh GIF muncul di tengah: bagian yang dipertahankan terang, sisanya digelapkan.
+3. Seret tepi atau sudut bingkai terang untuk memangkas. Seret di dalam bingkai untuk memindahkannya. Angka di samping **Pangkas** dan **Lebar keluaran** mengikuti otomatis.
+4. Klik **✂ Pangkas** lagi untuk kembali ke pratinjau biasa. Selama memangkas, lapisan di luar bingkai disembunyikan.
+
 ## Menambahkan teks, gambar, dan coretan
 - **+ Teks** menaruh tulisan di atas GIF Anda. Ketik di kotak sebelah kiri, pilih font, ukuran, dan warna, lalu seret teks ke tempat yang tepat. **Klik dua kali teks di gambar untuk mengeditnya lagi** (atau klik dua kali di daftar lapisan).
 - **+ Gambar** menambahkan gambar Anda sendiri, misalnya logo. **✏️ Gambar** memungkinkan Anda menggambar dengan mouse atau jari.

@@ -32,6 +32,12 @@ Mach aus einem Video ein GIF, bearbeite ein vorhandenes GIF oder speichere das E
 3. Unter **Bearbeiten**: **Start-Bild** / **End-Bild** schneiden Anfang oder Ende ab, **Tempo** macht es schneller oder langsamer, **Rückwärts** spielt es rückwärts ab, **FPS** (max. 50) und **Ausgabebreite** ändern Flüssigkeit und Größe, **Zuschneiden** schneidet das Bild zu.
 4. Wähle den Dateityp, drücke den blauen Knopf und lade das Ergebnis herunter. Fehler gemacht? Drücke oben auf **Zurück**.
 
+## Zuschneiden
+1. Öffne ein GIF im Tab **🎨 GIF-Editor**.
+2. Klicke über der Vorschau auf **✂ Zuschneiden**. Das ganze GIF erscheint mittig: Der Teil, der bleibt, ist hell, der Rest abgedunkelt.
+3. Ziehe eine Kante oder Ecke des hellen Rahmens, um zuzuschneiden. Ziehe in den Rahmen hinein, um ihn zu verschieben. Die Zahlen bei **Zuschneiden** und **Ausgabebreite** folgen automatisch.
+4. Klicke erneut auf **✂ Zuschneiden**, um zur normalen Vorschau zurückzukehren. Während des Zuschneidens sind Ebenen außerhalb des Rahmens ausgeblendet.
+
 ## Text, Bilder und Zeichnungen hinzufügen
 - **+ Text** setzt Wörter auf dein GIF. Tippe sie links in das Feld, wähle Schrift, Größe und Farbe und ziehe den Text an die richtige Stelle. **Mit einem Doppelklick auf den Text im Bild kannst du ihn wieder ändern** (oder per Doppelklick in der Ebenenliste).
 - **+ Bild** fügt ein eigenes Bild hinzu, zum Beispiel ein Logo. Mit **✏️ Zeichnen** malst du mit Maus oder Finger.
